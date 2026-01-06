@@ -48,6 +48,7 @@ export const selectMenuList = createAsyncThunk<MenuListRVO, MenuListPVO | undefi
     }
   },
   {
+    /* selectMenuList Thunk 이 Redex state 의 값에 따라 호출할지 말지 결정 */
     condition: (params, { getState }) => {
       const state = getState();
 
@@ -58,8 +59,10 @@ export const selectMenuList = createAsyncThunk<MenuListRVO, MenuListPVO | undefi
       const hasMenu = state.menu.list?.length > 0;
       const sameLang = state.menu.langSeCd === desiredLang;
 
-      if (state.menu.loading)return false;                        // 중복 호출 방지
-      if (state.menu.loaded && hasMenu && sameLang)return false;
+      if(state.menu.loading)return false;             // 중복 호출 방지
+
+      // 조회된 메뉴 목록이 없어서 빈 배열이어도 "해당 언어로 이미 로드됨"이면 재호출 막기
+      if(state.menu.loaded && sameLang)return false;  // hasMenu 제거, 조회된 메뉴 목록이 없으면 []이므로 state.menu.list?.length = 0 이고, hasMenu=false가 되어서 무한 조회되는 현상 발생!!
 
       return true; // 호출 필요
     }

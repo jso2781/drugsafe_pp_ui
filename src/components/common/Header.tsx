@@ -1,17 +1,14 @@
 import { useTranslation } from 'react-i18next'
-import i18n, { LOCALE_KEY } from '@/i18n/i18n'
+import { LOCALE_KEY } from '@/i18n/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { MenuProps, Layout, Menu, Input, Row, Col, Space, Typography, Divider, Button, Drawer } from 'antd'
-import {
-  SearchOutlined,
-  LoginOutlined,
-  UserAddOutlined,
-  GlobalOutlined,
-} from '@ant-design/icons'
+import { GlobalOutlined } from '@ant-design/icons'
 import SkipNavigation from './SkipNavigation'
 import { getLangFromPathname, langPath } from "@/routes/lang";
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
+import { selectMenuList } from '@/features/auth/MenuThunks'
+import { clearMenuCache } from '@/features/auth/MenuSlice'
 import { RootState } from '@/app/store'
 const { Text, Link: AntLink, Title } = Typography
 
@@ -356,16 +353,22 @@ function buildAntdMenuItems(menus: any[], to: (p: string) => string): MenuProps[
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const { list, totalCount } = useAppSelector((s: RootState) => s.menu);
 
   const curLang = useMemo(() => getLangFromPathname(location.pathname), [location.pathname]);
   const to = useMemo(() => (p: string) => langPath(p, curLang), [curLang]);
 
   /**************************** 한국어/영어 사이트 변환 설정 시작 *********************/
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
+
+  useEffect(() => {
+    //  언어가 바뀔 때마다 해당 언어 메뉴 재조회
+    dispatch(selectMenuList({ langSeCd: i18nInstance.language }));
+  }, [dispatch, i18nInstance.language]);
 
   const toggleLang = () => {
-    const nextLang = i18n.language === "ko" ? "en" : "ko";
+    const nextLang = i18nInstance.language === "ko" ? "en" : "ko";
 
     // 현재 경로에서 lang segment 교체
     const pathSegments = location.pathname.split("/");
@@ -376,10 +379,13 @@ export default function Header() {
     // 다시 경로 조합
     const nextPath = pathSegments.join("/");
 
-    console.log("Header toggleLang curLang="+i18n.language+", next="+nextLang);
+    // 토글할 때마다 메뉴 목록을 무조건 다시 불러오게 캐시 초기화
+    dispatch(clearMenuCache());
+
+    console.log("Header toggleLang curLang="+i18nInstance.language+", next="+nextLang);
 
     localStorage.setItem(LOCALE_KEY, nextLang)  // ✅ APP_LOCALE 저장
-    i18n.changeLanguage(nextLang);              // ✅ UI 즉시 반영
+    i18nInstance.changeLanguage(nextLang);              // ✅ UI 즉시 반영
     navigate(nextPath);                         // ✅ 경로 이동
   }
   /**************************** 한국어/영어 사이트 변환 설정 종료 *********************/
@@ -618,7 +624,7 @@ export default function Header() {
               <Space size={8}>
               <Button type="text" size="small" onClick={() => navigate('/screens')}>Screens</Button>
               <Button type="text" size="small" icon={<GlobalOutlined />} onClick={toggleLang}>
-                {i18n.language === 'ko' ? 'English' : '한국어'}
+                {i18nInstance.language === 'ko' ? 'English' : '한국어'}
               </Button>
             </Space>
           </div>
@@ -630,7 +636,7 @@ export default function Header() {
           <div className="logo">
             <h1>
               <Link to="/" aria-label={t("kidsHomeAria")}>
-                <img src={i18n.language === 'ko' ? '/img/logo.png' : '/img/logo_eng02.png'} alt={`KIDS ${t("kidsName")}`} />
+                <img src={i18nInstance.language === 'ko' ? '/img/logo.png' : '/img/logo_eng02.png'} alt={`KIDS ${t("kidsName")}`} />
               </Link>
             </h1>
           </div>
