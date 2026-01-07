@@ -246,6 +246,11 @@ export const screens: ScreenMeta[] = [
     "uiType": "form"
   },
   {
+    "id": "KIDS-PP-US-LG-10",
+    "title": "비밀번호 변경 완료",
+    "uiType": "popup"
+  },
+  {
     "id": "KIDS-PP-US-LG-11",
     "title": "본인 인증 Any-ID 간편인증",
     "uiType": "form"
@@ -339,5 +344,17 @@ export const screens: ScreenMeta[] = [
     "id": "KIDS-PP-US-PI-01",
     "title": "이상사례 보고란",
     "uiType": "page"
-  }
+  },
+
+  //내업무 템플릿 예시
+  {
+    "id": "KIDS-PP-US-MT-01_List",
+    "title": "내업무 리스트",
+    "uiType": "detail"
+  },
+  {
+    "id": "KIDS-PP-US-MT-01_Write",
+    "title": "내업무 등록",
+    "uiType": "detail"
+  },
 ]

@@ -1,5 +1,18 @@
 @use '../base/mixins';
 
+/* 제목 링크에 포커스가 갔을 때의 스타일 */
+.board-link:focus {
+  outline: 2px solid #1890ff; /* Ant Design 기본 블루 색상 */
+  outline-offset: 2px;
+  border-radius: 2px;
+  background-color: rgba(24, 144, 255, 0.1);
+  text-decoration: underline; 
+}
+.board-link:hover,
+.board-link:focus {
+  color: #40a9ff;
+}
+
 // 게시판 검색 영역
 .board-search {
   display: flex;
@@ -167,7 +180,41 @@
   margin-top: 40px;
 }
 
-//////////////////////////////////////////////
+///////////////// 내업무 ///////////////// 
+
+/* 검색필터 */
+.filter_finder { position: relative; margin: 0 0 40px 0; padding: 15px; background: #f2f4f6; border: 1px solid rgb(26 16 82 / 14%); border-radius: 8px; }
+.filter_finder .search_btn_group { text-align: center; margin: 15px 0 0 0; padding: 15px 0 0 0; border-top: 1px solid #e5e5e5; display: flex; justify-content: center; gap: 8px; }
+.filter_finder .search_btn_group button { width: 120px; height: 36px; }
+
+/* 게시판 작성/수정 페이지 */
+.sub_path ~ .sub_path { margin-top: 40px; }
+.sub_path { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; }
+.sub_path .tit { font-size: 20px; font-weight: 700; color: var(--color-text-1); position: relative; padding-left: 15px; margin: 0; line-height: 1.2; }
+.sub_path .tit::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 18px; background: var(--color-text-1); border-radius: 2px; }
+
+.tbl_wrap .tbl_view { border-top: 1px solid var(--border-1); border-left: 1px solid #E7E7E7; width: 100%; }
+.tbl_wrap .tbl_view .form_row { border-bottom: 1px solid #E7E7E7; display: flex !important; align-items: stretch; }
+.tbl_view .ant-form-item { margin-bottom: 0 !important; width: 100%; display: flex !important; flex-direction: row !important; }
+.tbl_view .ant-form-item-row { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100%; }
+.tbl_view .ant-form-item-label { flex: 0 0 200px !important; width: 200px; background: #F6F8F9; padding: 10px 15px !important; text-align: left; display: flex; align-items: center; border-right: 1px solid #E7E7E7; }
+.tbl_view .ant-form-item-control { flex: 1 1 0% !important; padding: 8px 10px; background: #fff; border-right: 1px solid #E7E7E7; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.tbl_view .ant-input, .tbl_view .ant-select, .tbl_view .ant-picker, .tbl_view .ant-input-number { width: 100% !important; }
+
+@media (max-width: 1199px) {
+  .tbl_wrap .tbl_view .form_row { flex-direction: column; }
+  .tbl_view .ant-form-item { flex-direction: column !important; }
+  .tbl_view .ant-form-item-row { flex-direction: column !important; }
+  .tbl_view .ant-form-item-label { flex: 1 1 auto !important; width: 100% !important; border-bottom: 1px solid #E7E7E7; padding: 8px 15px !important; }
+  .tbl_view .ant-form-item-control { width: 100% !important; padding: 10px !important; }
+  .tbl_wrap .tbl_view .ant-col { width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; }
+}
+
+.board_btn_group {display: flex; justify-content: end; margin-top: 30px; }
+.board_btn_group button { min-width: 120px; height: 48px; font-size: 16px; font-weight: 600; }
+
+
+///////////////// 테스트코드 ///////////////// 
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;

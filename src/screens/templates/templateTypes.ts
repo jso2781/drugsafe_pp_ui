@@ -82,6 +82,8 @@ export type PopupTemplateConfig = {
   width?: number
   content?: React.ReactNode
   onOk?: () => void
+
+  wrapClassName?: string
 }
 
 export type DetailItemConfig = {

@@ -6,6 +6,7 @@
 @use './ko/layout/header';
 @use './ko/layout/footer';
 @use './ko/layout/sub';
+@use './ko/layout/sub-full';
 
 @use './ko/components/grid';
 @use './ko/pages/board';
@@ -13,18 +14,18 @@
 @use './ko/pages/dur';
 @use './ko/pages/content';
 
-.app-main {
-  @include mixins.container;
-  padding: 18px 0 28px;
-}
+// .app-main {
+//   @include mixins.container;
+//   padding: 18px 0 28px;
+// }
 
-.container {
-  @include mixins.container;
-}
+// .container {
+//   @include mixins.container;
+// }
 
-.container-full {
-  @include mixins.container(var(--container-full));
-}
+// .container-full {
+//   @include mixins.container(var(--container-full));
+// }
 
 .page-title h1 {
   margin: 0 0 6px;

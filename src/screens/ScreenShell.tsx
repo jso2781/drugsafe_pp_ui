@@ -55,7 +55,7 @@ export default function ScreenShell({ screenId, title, uiType, children, pdfUrl 
   }, [resolvedPdfUrl, screenId])
 
   return (
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: '16px 0' }} className="container">
       <Card>
         <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <Space wrap align="center">

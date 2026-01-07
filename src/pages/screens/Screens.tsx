@@ -23,7 +23,7 @@ export default function Screens() {
   ]
 
   return (
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: 16 }} className="container">
       <Card>
         <Space direction="vertical" style={{ width: '100%' }} size={12}>
           <Title level={3} style={{ margin: 0 }}>화면ID 목록</Title>

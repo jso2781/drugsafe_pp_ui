@@ -25,15 +25,12 @@ export default function KIDS_PP_US_LG_02() {
               <div className="pageCont_login">
                 <Row>
                   <Col span={12} className="login_form_section">
-                    <Form
-                      name="login_form"
-                      layout="vertical"
-                    >
+                    <Form name="login_form" layout="vertical">
                       <Form.Item
-                        name="username"
-                        label="아이디"
-                        rules={[{ message: '아이디 혹은 이메일을 입력하세요.' }]}
-                      >
+                          name="username"
+                          label="아이디"
+                          rules={[{ message: '아이디 혹은 이메일을 입력하세요.' }]}
+                        >
                         <Input placeholder="아이디 혹은 이메일을 입력하세요." />
                       </Form.Item>
                       <Alert
@@ -61,7 +58,7 @@ export default function KIDS_PP_US_LG_02() {
                         <Checkbox>아이디 저장</Checkbox>
                       </Form.Item>
                       <Form.Item className="login_actions">
-                        <Button htmlType="submit" block className="btn_login">
+                        <Button type="primary" htmlType="submit" block size="large" className="btn_login fw_700">
                           로그인
                         </Button>
                       </Form.Item>
@@ -84,7 +81,9 @@ export default function KIDS_PP_US_LG_02() {
                   </Col>
                 </Row>
               </div>
+
             </div>
+            {/* content_view :: e */}
           </div>
           {/* sub content :: e */}
         </div>
