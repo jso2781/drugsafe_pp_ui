@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { flushSync } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -349,6 +349,7 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  // Rest API 호출로 메뉴 가져오기
   const { list } = useAppSelector((s) => s.menu)
 
   const lang = getLangFromPathname(location.pathname) || 'ko'
@@ -365,219 +366,138 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
   // 서브메뉴 닫기 타임아웃 관리
   const closeTimeoutsRef = useRef<{ [key: string]: NodeJS.Timeout }>({})
 
-  // 메뉴 트리 구조 생성
-  const { rootMenus, byParent } = useMemo(() => buildMenuTree(list), [list])
-
-  const menuItems1 = [
-    {
-      key: 'main-tasks',
-      label: '주요 업무',
-      children: [
-        {
-          key: 'safety-report',
-          label: '의약품 이상사례보고',
-          children: [
-            {
-              key: 'safety-report-online1',
-              label: '이상사례보고',
-              children: [
-                { key: 'safety-report-online11', label: <NavLink to={to("/safety/report1")}>이상사례 보고란?</NavLink> },
-                { key: 'safety-report-online12', label: <NavLink to={to("/safety/report2")}>KAERS란?</NavLink> },
-              ],
-            },
-            {
-              key: 'safety-report-online2', 
-              label: '온라인 보고',
-              children: [
-                { key: 'safety-report-online21', label: <NavLink to='https://nedrug.mfds.go.kr/CCCBA03F010/getReport'>의약품이상사례</NavLink> },
-                { key: 'safety-report-online22', label: <NavLink to='https://nedrug.mfds.go.kr/CCCBA03F010/getReportQuasiDrug'>의약외품(생리대 등)</NavLink> },
-              ],
-            },
-            { key: 'safety-report-offline', label: <NavLink to={to("/safety/report5")}>오프라인 보고</NavLink> },
-            { key: 'safety-report-archive', label: <NavLink to={to("/safety/report6")}>이상사례보고자료실</NavLink> },
-            { key: 'safety-report-guide', label: <NavLink to={to("/safety/report7")}>온라인보고방법 안내</NavLink> },
-          ],
-        },
-        {
-          key: 'side-effects-report',
-          label: '의약품 부작용 보고 자료',
-          children: [
-            { key: 'side-effects-report1', label: '의약품 부작용 보고1' },
-            { key: 'side-effects-report2', label: '의약품 부작용 보고2' },
-            { key: 'side-effects-report3', label: '의약품 부작용 보고3' }
-          ]
-        },
-        {
-          key: 'safety-mgmt',
-          label: '의약품 안전관리',
-          children: [
-            { key: 'safety-terms', label: '약물감시용어' },
-            { key: 'safety-causality', label: '부작용 인과관계규명' },
-            { key: 'safety-related', label: '유관기관' }
-          ]
-        },
-        {
-          key: 'pharma-linkage-analysis',
-          label: '의약품.의료정보.연계분석',
-          children: [
-            { key: 'pharma-linkage-analysis1', label: '의약품.의료정보.연계분석1' },
-            { key: 'pharma-linkage-analysis2', label: '의약품.의료정보.연계분석2' },
-            { key: 'pharma-linkage-analysis3', label: '의약품.의료정보.연계분석3' }
-          ]
-        },
-        {
-          key: 'dur',
-          label: 'DUR 정보',
-          children: [
-            { key: 'dur-understand', label: 'DUR 이해' },
-            {
-              key: 'dur-search-room', label: 'DUR 정보검색방',
-              children: [
-                { key: 'dur-search-room1', label: 'DUR 통합검색' },
-                { key: 'dur-search-room2', label: '병용금기' },
-                { key: 'dur-search-room3', label: '특정연령대금기' },
-                { key: 'dur-search-room4', label: '임부금기' },
-                { key: 'dur-search-room5', label: '효능군중복주의' },
-                { key: 'dur-search-room6', label: '용량주의' },
-                { key: 'dur-search-room7', label: '투여기간주의' },
-                { key: 'dur-search-room8', label: '노인주의' },
-                { key: 'dur-search-room9', label: '수유부주의' },
-              ],
-            },
-            {
-              key: 'dur-appropriate-use', label: '의약품 적정사용 정보방',
-              children: [
-                { key: 'dur-appropriate-use1', label: '노인 적정사용정보집' },
-                { key: 'dur-appropriate-use2', label: '소아 적정사용정보집' },
-                { key: 'dur-appropriate-use3', label: '임부 적정사용정보집' },
-                { key: 'dur-appropriate-use4', label: '간질환 적정사용정보집' },
-                { key: 'dur-appropriate-use5', label: '신질환 적정사용정보집' },
-              ],
-            },
-            { key: 'dur-notice', label: <NavLink to={to("/dur/notice")}>DUR 게시판</NavLink> },
-            { key: 'dur-proposal', label: <NavLink to={to("/dur/proposal")}>DUR 제안</NavLink> },
-          ],
-        },
-        {
-          key: 'relief',
-          label: '부작용 피해구제',
-          children: [
-            { key: 'relief-system', label: '제도소개' },
-            { key: 'relief-apply', label: '피해구제 신청' },
-            { key: 'relief-news', label: '뉴스/소식' },
-            { key: 'relief-faq', label: <NavLink to='https://nedrug.mfds.go.kr'>자주하는 질문</NavLink> },
-          ],
-        },
-        {
-          key: 'clinical-trial',
-          label: '임상시험안전지원',
-          children: [
-            { key: 'clinical-trial1', label: '임상시험안전지원기관' },
-            { key: 'clinical-trial2', label: '협약 안내' },
-            { key: 'clinical-trial3', label: '중앙IRB신청' },
-            { key: 'clinical-trial4', label: '임상시험헬프데스크' },
-            { key: 'clinical-trial5', label: '공지사항' },
-            { key: 'clinical-trial6', label: '자료실' },
-          ],
-        },
-      ]
-    },
-    {
-      key: 'open',
-      label: '정보공개',
-      children: [
-        {
-          key: 'open-info', 
-          label: '정보공개',
-          children: [
-            { key: 'open-info1', label: '업무처리절차' },
-            { key: 'open-info2', label: <NavLink to='https://open.go.kr'>정보공개 청구</NavLink> },
-            { key: 'open-info3', label: '임직원국외출장' },
-            { key: 'open-info4', label: '원장 업무추진비 집행내역' },
-          ],
-        },
-        { key: 'open-data', label: '공공데이터 개방' },
-        {
-          key: 'open-mgmt',  
-          label: '경영공시',
-          children: [
-            { key: 'open-mgmt1', label: '부패행위 징계현황' },
-            { key: 'open-mgmt2', label: '징계기준' },
-            { key: 'open-mgmt3', label: '징계현황' },
-          ],
-        },
-        { key: 'open-bizname', label: '사업실명제' },
-      ],
-    },
-    {
-      key: 'notice',
-      label: '기관소식',
-      children: [
-        { key: 'notice-list', label: <NavLink to={to("/notice")}>공지사항</NavLink> },
-        { key: 'notice-jobs', label: '채용게시판' },
-        { key: 'notice-faq', label: 'FAQ' },
-        { key: 'notice-petition', label: '국민신문고' },
-        { key: 'notice-press',label: '보도자료' },
-        {
-          key: 'notice-newsletter', 
-          label: '뉴스레터',
-          children: [
-            { key: 'notice-bio-focus', label: <NavLink to='https://ltfu.mfds.go.kr'>첨단바이오 포커스</NavLink> },
-            { key: 'notice-safe-info', label: '마약류 안전정보지' },
-            { key: 'notice-leaflet', label: '리플릿' }
-          ],
-        },
-        { key: 'notice-card', label: '카드뉴스' },
-        { key: 'notice-video', label: '동영상' },
-        { key: 'notice-archive', label: '자료실' },
-      ],
-    },
-    {
-      key: 'about',
-      label: '기관소개',
-      children: [
-        { key: 'about-greeting', label: '기관장 인사말' },
-        { key: 'about-former', label: '역대 기관장' },
-        { key: 'about-history', label: '연혁' },
-        { key: 'about-vision', label: '비전 및 목표' },
-        { key: 'about-org', label: '조직도' },
-        { key: 'about-law', label: '설립근거 및 관련법령' },
-        { key: 'about-charter', label: '고객헌장' },
-        { key: 'about-news', label: '우리원동정' },
-        { key: 'about-ci', label: 'CI소개' },
-        {
-          key: 'about-ethics', 
-          label: '윤리경영',
-          children: [
-            { key: 'about-ethics-clean', label: '클린신고센터' }
-          ],
-        },
-        { key: 'about-character', label: '캐릭터소개' },
-        { key: 'about-map', label: <NavLink to='https://www.drugsafe.or.kr/iwt/ds/ko/introduction/EgovLocation.do'>오시는 길</NavLink> },
-      ],
-    },
+  /**
+   * 목업 데이터 - 주석처리 (Rest API 사용 시)
+   * menuItems1: menuData.json에서 추출한 메뉴 데이터
+   * 화면에 메뉴로 표기할 때 필요한 속성값만 포함 (menuSn, menuNm, menuUrlAddr, upMenuSn, menuSeq, menuTypeCd, depLevel)
+   */
+  const menuItems1: MenuRVO[] = [
+    { menuSn: 1000, menuNm: '주요 업무', upMenuSn: undefined, menuSeq: 1, menuTypeCd: 'MENU', depLevel: 1 },
+    { menuSn: 1001, menuNm: '의약품 이상사례보고', upMenuSn: 1000, menuSeq: 1, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1010, menuNm: '이상사례보고', upMenuSn: 1001, menuSeq: 1, menuTypeCd: 'MENU', depLevel: 3 },
+    { menuSn: 1020, menuNm: '이상사례 보고란?', menuUrlAddr: '/safety/report1', upMenuSn: 1010, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1021, menuNm: 'KAERS란?', menuUrlAddr: '/safety/report2', upMenuSn: 1010, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1011, menuNm: '온라인 보고', upMenuSn: 1001, menuSeq: 2, menuTypeCd: 'MENU', depLevel: 3 },
+    { menuSn: 1030, menuNm: '의약품이상사례', menuUrlAddr: 'https://nedrug.mfds.go.kr/CCCBA03F010/getReport', upMenuSn: 1011, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1031, menuNm: '의약외품(생리대 등)', menuUrlAddr: 'https://nedrug.mfds.go.kr/CCCBA03F010/getReportQuasiDrug', upMenuSn: 1011, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1012, menuNm: '오프라인 보고', menuUrlAddr: '/safety/report5', upMenuSn: 1001, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1013, menuNm: '이상사례보고자료실', menuUrlAddr: '/safety/report6', upMenuSn: 1001, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1014, menuNm: '온라인보고방법 안내', menuUrlAddr: '/safety/report7', upMenuSn: 1001, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1002, menuNm: '의약품 부작용 보고 자료', upMenuSn: 1000, menuSeq: 2, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1040, menuNm: '의약품 부작용 보고1', upMenuSn: 1002, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1041, menuNm: '의약품 부작용 보고2', upMenuSn: 1002, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1042, menuNm: '의약품 부작용 보고3', upMenuSn: 1002, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1003, menuNm: '의약품 안전관리', upMenuSn: 1000, menuSeq: 3, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1050, menuNm: '약물감시용어', upMenuSn: 1003, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1051, menuNm: '부작용 인과관계규명', upMenuSn: 1003, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1052, menuNm: '유관기관', upMenuSn: 1003, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1004, menuNm: '의약품.의료정보.연계분석', upMenuSn: 1000, menuSeq: 4, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1060, menuNm: '의약품.의료정보.연계분석1', upMenuSn: 1004, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1061, menuNm: '의약품.의료정보.연계분석2', upMenuSn: 1004, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1062, menuNm: '의약품.의료정보.연계분석3', upMenuSn: 1004, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1005, menuNm: 'DUR 정보', upMenuSn: 1000, menuSeq: 5, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1070, menuNm: 'DUR 이해', upMenuSn: 1005, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1071, menuNm: 'DUR 정보검색방', upMenuSn: 1005, menuSeq: 2, menuTypeCd: 'MENU', depLevel: 3 },
+    { menuSn: 1080, menuNm: 'DUR 통합검색', upMenuSn: 1071, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1081, menuNm: '병용금기', upMenuSn: 1071, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1082, menuNm: '특정연령대금기', upMenuSn: 1071, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1083, menuNm: '임부금기', upMenuSn: 1071, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1084, menuNm: '효능군중복주의', upMenuSn: 1071, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1085, menuNm: '용량주의', upMenuSn: 1071, menuSeq: 6, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1086, menuNm: '투여기간주의', upMenuSn: 1071, menuSeq: 7, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1087, menuNm: '노인주의', upMenuSn: 1071, menuSeq: 8, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1088, menuNm: '수유부주의', upMenuSn: 1071, menuSeq: 9, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1072, menuNm: '의약품 적정사용 정보방', upMenuSn: 1005, menuSeq: 3, menuTypeCd: 'MENU', depLevel: 3 },
+    { menuSn: 1090, menuNm: '노인 적정사용정보집', upMenuSn: 1072, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1091, menuNm: '소아 적정사용정보집', upMenuSn: 1072, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1092, menuNm: '임부 적정사용정보집', upMenuSn: 1072, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1093, menuNm: '간질환 적정사용정보집', upMenuSn: 1072, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1094, menuNm: '신질환 적정사용정보집', upMenuSn: 1072, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 4 },
+    { menuSn: 1073, menuNm: 'DUR 게시판', menuUrlAddr: '/dur/notice', upMenuSn: 1005, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1074, menuNm: 'DUR 제안', menuUrlAddr: '/dur/proposal', upMenuSn: 1005, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1006, menuNm: '부작용 피해구제', upMenuSn: 1000, menuSeq: 6, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1110, menuNm: '제도소개', upMenuSn: 1006, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1111, menuNm: '피해구제 신청', upMenuSn: 1006, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1112, menuNm: '뉴스/소식', upMenuSn: 1006, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1113, menuNm: '자주하는 질문', menuUrlAddr: 'https://nedrug.mfds.go.kr', upMenuSn: 1006, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1007, menuNm: '임상시험안전지원', upMenuSn: 1000, menuSeq: 7, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 1120, menuNm: '임상시험안전지원기관', upMenuSn: 1007, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1121, menuNm: '협약 안내', upMenuSn: 1007, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1122, menuNm: '중앙IRB신청', upMenuSn: 1007, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1123, menuNm: '임상시험헬프데스크', upMenuSn: 1007, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1124, menuNm: '공지사항', upMenuSn: 1007, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1125, menuNm: '자료실', upMenuSn: 1007, menuSeq: 6, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 1100, menuNm: '정보공개', upMenuSn: undefined, menuSeq: 2, menuTypeCd: 'MENU', depLevel: 1 },
+    { menuSn: 2000, menuNm: '정보공개', upMenuSn: 1100, menuSeq: 1, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 2010, menuNm: '업무처리절차', upMenuSn: 2000, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2011, menuNm: '정보공개 청구', menuUrlAddr: 'https://open.go.kr', upMenuSn: 2000, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2012, menuNm: '임직원국외출장', upMenuSn: 2000, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2013, menuNm: '원장 업무추진비 집행내역', upMenuSn: 2000, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2001, menuNm: '공공데이터 개방', upMenuSn: 1100, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 2002, menuNm: '경영공시', upMenuSn: 1100, menuSeq: 3, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 2020, menuNm: '부패행위 징계현황', upMenuSn: 2002, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2021, menuNm: '징계기준', upMenuSn: 2002, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2022, menuNm: '징계현황', upMenuSn: 2002, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 2003, menuNm: '사업실명제', upMenuSn: 1100, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 1200, menuNm: '기관소식', upMenuSn: undefined, menuSeq: 3, menuTypeCd: 'MENU', depLevel: 1 },
+    { menuSn: 3000, menuNm: '공지사항', menuUrlAddr: '/notice', upMenuSn: 1200, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3001, menuNm: '채용게시판', upMenuSn: 1200, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3002, menuNm: 'FAQ', upMenuSn: 1200, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3003, menuNm: '국민신문고', upMenuSn: 1200, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3004, menuNm: '보도자료', upMenuSn: 1200, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3005, menuNm: '뉴스레터', upMenuSn: 1200, menuSeq: 6, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 3010, menuNm: '첨단바이오 포커스', menuUrlAddr: 'https://ltfu.mfds.go.kr', upMenuSn: 3005, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 3011, menuNm: '마약류 안전정보지', upMenuSn: 3005, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 3012, menuNm: '리플릿', upMenuSn: 3005, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 3006, menuNm: '카드뉴스', upMenuSn: 1200, menuSeq: 7, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3007, menuNm: '동영상', upMenuSn: 1200, menuSeq: 8, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 3008, menuNm: '자료실', upMenuSn: 1200, menuSeq: 9, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 1300, menuNm: '기관소개', upMenuSn: undefined, menuSeq: 4, menuTypeCd: 'MENU', depLevel: 1 },
+    { menuSn: 4000, menuNm: '기관장 인사말', upMenuSn: 1300, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4001, menuNm: '역대 기관장', upMenuSn: 1300, menuSeq: 2, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4002, menuNm: '연혁', upMenuSn: 1300, menuSeq: 3, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4003, menuNm: '비전 및 목표', upMenuSn: 1300, menuSeq: 4, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4004, menuNm: '조직도', upMenuSn: 1300, menuSeq: 5, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4005, menuNm: '설립근거 및 관련법령', upMenuSn: 1300, menuSeq: 6, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4006, menuNm: '고객헌장', upMenuSn: 1300, menuSeq: 7, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4007, menuNm: '우리원동정', upMenuSn: 1300, menuSeq: 8, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4008, menuNm: 'CI소개', upMenuSn: 1300, menuSeq: 9, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4009, menuNm: '윤리경영', upMenuSn: 1300, menuSeq: 10, menuTypeCd: 'MENU', depLevel: 2 },
+    { menuSn: 4012, menuNm: '클린신고센터', upMenuSn: 4009, menuSeq: 1, menuTypeCd: 'PAGE', depLevel: 3 },
+    { menuSn: 4010, menuNm: '캐릭터소개', upMenuSn: 1300, menuSeq: 11, menuTypeCd: 'PAGE', depLevel: 2 },
+    { menuSn: 4011, menuNm: '오시는 길', menuUrlAddr: 'https://www.drugsafe.or.kr/iwt/ds/ko/introduction/EgovLocation.do', upMenuSn: 1300, menuSeq: 12, menuTypeCd: 'PAGE', depLevel: 2 },
   ];
 
-  const expertApplyMenuItem = {
-    key: 'expert-convert-apply',
-    label: <NavLink to={to("/expert/convert/apply")}>{t('usrSwtReg')}</NavLink>, // ✅ 기존 키 (en/ko 모두 존재)
+  /**
+   * 목업 데이터 - 주석처리 (Rest API 사용 시)
+   * expertMyWorkMenuItem을 MenuRVO 형식으로 변환
+   */
+  const expertMyWorkMenuItem: MenuRVO = {
+    menuSn: 2001,
+    menuNm: t('expertMyWork'),
+    menuUrlAddr: '/expert/my-work',
+    upMenuSn: undefined,
+    menuSeq: 0,
+    menuTypeCd: 'PAGE',
+    depLevel: 1,
   };
 
-  const expertMyWorkMenuItem = {
-    key: 'expert-my-work',
-    label: <NavLink to={to("/expert/my-work")}>{t('expertMyWork')}</NavLink>, // ✅ 새 키 추가 필요
-  };
+  // 목업 데이터 - 주석처리 (Rest API 사용 시)
+  // 권한별 분기 - 목업 데이터로 사용
+  const menuItems2 = [
+    // 필요하면 "전문가" 상위 그룹을 따로 두고 그 안에 넣어도 되고,
+    // 지금은 최상위에 단일 메뉴로 추가하는 예시
+    expertMyWorkMenuItem,
 
-  // 권한별 분기
-  // const menuItems2 = [
-  //   // 필요하면 “전문가” 상위 그룹을 따로 두고 그 안에 넣어도 되고,
-  //   // 지금은 최상위에 단일 메뉴로 추가하는 예시
-  //   ...(isExpert ? [expertMyWorkMenuItem] : []),
-
-  //   ...menuItems1
-  // ];
+    ...menuItems1
+  ];
   
-  // 언어 변경 시 메뉴 목록 재조회
+  // const { rootMenus, byParent } = useMemo(() => buildMenuTree(menuItems1), [menuItems1]);
+
+  // 메뉴 트리 구조 생성 - Rest API에서 가져온 list 사용
+  const { rootMenus, byParent } = useMemo(() => buildMenuTree(list), [list])
+
+  // Rest API 호출 - 언어 변경 시 메뉴 목록 재조회
   useEffect(() => {
     // 언어가 바뀔 때마다 해당 언어 메뉴 재조회
     dispatch(selectMenuList({ langSeCd: i18nInstance.language }))
@@ -591,7 +511,7 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
     pathSegments[1] = nextLang
     const nextPath = pathSegments.join('/')
 
-    // 토글할 때마다 메뉴 목록을 무조건 다시 불러오게 캐시 초기화
+    // Rest API 호출 - 토글할 때마다 메뉴 목록을 무조건 다시 불러오게 캐시 초기화
     dispatch(clearMenuCache())
 
     console.log('Header toggleLang curLang=' + i18nInstance.language + ', next=' + nextLang)
@@ -1388,6 +1308,9 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
                               clearTimeout(closeTimeoutsRef.current[menuKey])
                             }
                             
+                            // e.currentTarget을 변수에 저장하여 setTimeout 콜백에서 안전하게 사용
+                            const buttonElement = e.currentTarget
+                            
                             // 마우스가 완전히 벗어났을 때만 타임아웃 설정
                             closeTimeoutsRef.current[menuKey] = setTimeout(() => {
                               // 타임아웃이 여전히 유효한지 확인
@@ -1396,32 +1319,31 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
                               }
                               
                               // 메뉴가 여전히 열려있는지 확인
-                              if (!anchorEls[menuKey]) {
+                              const currentAnchorEl = anchorEls[menuKey]
+                              if (!currentAnchorEl) {
                                 delete closeTimeoutsRef.current[menuKey]
                                 return
                               }
                               
-                              // 현재 마우스 위치 확인
-                              const currentElement = document.elementFromPoint(e.clientX, e.clientY)
-                              const isInsideMenu = currentElement?.closest(`[data-menu-key="${menuKey}"]`) !== null
-                              const isInsideButton = currentElement === e.currentTarget || 
-                                e.currentTarget.contains(currentElement as Node)
-                              const isInsideOtherRoot = currentElement?.closest('button[data-root-menu]') !== null
+                              // 현재 마우스 위치 확인 (이벤트 좌표가 아닌 실제 마우스 위치 사용)
+                              // 마우스 이벤트를 직접 사용할 수 없으므로, 메뉴와 버튼 요소가 활성 상태인지 확인
+                              const menuElement = document.querySelector(`[data-menu-key="${menuKey}"]`)
+                              const menuItemElement = document.querySelector(`[data-menu-item-key="${menuKey}"]`)
                               
-                              // 다른 루트 메뉴에 있으면 즉시 닫기
-                              if (isInsideOtherRoot) {
-                                handleMenuClose(menuKey)
+                              // 메뉴가 열려있고, 메뉴 요소나 버튼 요소가 존재하는 경우
+                              // 실제로는 마우스가 메뉴 영역에 있으면 onMouseEnter가 호출되어 타임아웃이 취소되므로
+                              // 여기까지 도달했다는 것은 마우스가 메뉴 영역 밖에 있다는 의미
+                              // 하지만 안전을 위해 한 번 더 확인
+                              if (menuElement || menuItemElement) {
+                                // 메뉴 요소가 있으면 타임아웃만 취소하고 메뉴는 유지
                                 delete closeTimeoutsRef.current[menuKey]
                                 return
                               }
                               
-                              // 메뉴 영역이나 버튼 영역에 마우스가 없으면 닫기
-                              if (!isInsideMenu && !isInsideButton) {
+                              // 메뉴 영역에 마우스가 없으면 닫기
                                 handleMenuClose(menuKey)
-                              }
-                              
                               delete closeTimeoutsRef.current[menuKey]
-                            }, 100)
+                            }, 200) // 타임아웃을 200ms로 늘려서 메뉴 영역으로 이동할 시간 확보
                           }}
                           endIcon={<ArrowDropDown />}
                           sx={{
@@ -1473,27 +1395,27 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
                                   return
                                 }
                                 
-                                if (!anchorEls[menuKey]) {
+                                const currentAnchorEl = anchorEls[menuKey]
+                                if (!currentAnchorEl) {
                                   delete closeTimeoutsRef.current[menuKey]
                                   return
                                 }
                                 
-                                const currentElement = document.elementFromPoint(e.clientX, e.clientY)
-                                const isInsideMenu = currentElement?.closest(`[data-menu-key="${menuKey}"]`) !== null
-                                const isInsideButton = currentElement === anchorEl || 
-                                  (anchorEl && anchorEl.contains(currentElement as Node))
-                                
-                                if (!isInsideMenu && !isInsideButton) {
+                                // 메뉴 요소가 여전히 존재하는지 확인
+                                // 메뉴 영역에 마우스가 있으면 onMouseEnter가 호출되어 타임아웃이 취소되므로
+                                // 여기까지 도달했다는 것은 마우스가 메뉴 영역 밖에 있다는 의미
+                                const menuElement = document.querySelector(`[data-menu-key="${menuKey}"]`)
                                   const hasOpenChild = Object.keys(anchorEls).some((key) => 
                                     key.startsWith(menuKey + '-') && anchorEls[key] !== null
                                   )
-                                  if (!hasOpenChild) {
+                                
+                                // 하위 메뉴가 열려있지 않고, 메뉴 요소가 없으면 닫기
+                                if (!hasOpenChild && !menuElement) {
                                     handleMenuClose(menuKey)
-                                  }
                                 }
                                 
                                 delete closeTimeoutsRef.current[menuKey]
-                              }, 100)
+                              }, 200) // 타임아웃을 200ms로 늘려서 메뉴 영역으로 이동할 시간 확보
                             },
                           }}
                           PaperProps={{
@@ -1532,27 +1454,27 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
                                   return
                                 }
                                 
-                                if (!anchorEls[menuKey]) {
+                                const currentAnchorEl = anchorEls[menuKey]
+                                if (!currentAnchorEl) {
                                   delete closeTimeoutsRef.current[menuKey]
                                   return
                                 }
                                 
-                                const currentElement = document.elementFromPoint(e.clientX, e.clientY)
-                                const isInsideMenu = currentElement?.closest(`[data-menu-key="${menuKey}"]`) !== null
-                                const isInsideButton = currentElement === anchorEl || 
-                                  (anchorEl && anchorEl.contains(currentElement as Node))
-                                
-                                if (!isInsideMenu && !isInsideButton) {
+                                // 메뉴 요소가 여전히 존재하는지 확인
+                                // 메뉴 영역에 마우스가 있으면 onMouseEnter가 호출되어 타임아웃이 취소되므로
+                                // 여기까지 도달했다는 것은 마우스가 메뉴 영역 밖에 있다는 의미
+                                const menuElement = document.querySelector(`[data-menu-key="${menuKey}"]`)
                                   const hasOpenChild = Object.keys(anchorEls).some((key) => 
                                     key.startsWith(menuKey + '-') && anchorEls[key] !== null
                                   )
-                                  if (!hasOpenChild) {
+                                
+                                // 하위 메뉴가 열려있지 않고, 메뉴 요소가 없으면 닫기
+                                if (!hasOpenChild && !menuElement) {
                                     handleMenuClose(menuKey)
-                                  }
                                 }
                                 
                                 delete closeTimeoutsRef.current[menuKey]
-                              }, 100)
+                              }, 200) // 타임아웃을 200ms로 늘려서 메뉴 영역으로 이동할 시간 확보
                             },
                           }}
                         >
