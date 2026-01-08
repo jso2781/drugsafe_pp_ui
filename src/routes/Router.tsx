@@ -16,6 +16,10 @@ import DurNoticeDetailKo from '@/pages/ko/dur/DurNoticeDetail'
 import NotFoundKo from '@/pages/ko/NotFound'
 import LoginKo from '@/pages/ko/Login'
 
+// 게시판 테스트용
+import CommonBoardListKo from '@/pages/ko/newboard/common/CommonList'
+import CommonBoardDetailKo from '@/pages/ko/newboard/common/CommonDetail'
+
 // en 페이지들 (프로젝트에 실제 존재한다고 가정)
 import HomeEn from "@/pages/en/Home";
 import NoticeListEn from "@/pages/en/notice/NoticeList";
@@ -133,6 +137,10 @@ export default function Router() {
           <Route path="/:lang/dur/notice" element={<LangElement byLang={{ ko: <DurNoticeListKo />, en: <DurNoticeListEn /> }} />} />
           <Route path="/:lang/dur/notice/:id" element={<LangElement byLang={{ ko: <DurNoticeDetailKo />, en: <DurNoticeDetailEn /> }} />} />
           <Route path="/:lang/dur/proposal" element={<LangElement byLang={{ ko: <DurProposalKo />, en: <DurProposalEn /> }} />} />
+
+          {/* 게시판 테스트중 */}          
+          <Route path="/:lang/newboard/common/:bbsId" element={<LangElement byLang={{ ko: <CommonBoardListKo />, en: <CommonBoardListKo /> }} />} />
+          <Route path="/:lang/newboard/common/:bbsId/:sn" element={<LangElement byLang={{ ko: <CommonBoardDetailKo />, en: <CommonBoardDetailKo /> }} />} />
 
           {/* 언어 무관 퍼블리싱 템플릿 화면들 */}
           <Route path="/screens" element={<Screens />} />
