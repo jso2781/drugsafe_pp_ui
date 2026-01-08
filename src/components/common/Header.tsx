@@ -1119,20 +1119,24 @@ export default function Header({ onOpenNav }: { onOpenNav: () => void }) {
           <Container maxWidth="xl">
             <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', px: 2 }}>
               {/* 로고 */}
-              <Typography
-                component={Link}
+              <Link
                 to={to('/')}
-                variant="h5"
-                sx={{
-                  color: 'primary.main',
+                style={{
                   textDecoration: 'none',
-                  fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
                 }}
               >
-                {/* 한국의약품안전관리원 */}
-              </Typography>
+                <img
+                  src={i18nInstance.language === 'ko' ? '/img/logo.png' : '/img/logo_eng02.png'}
+                  alt={`KIDS ${t('kidsName')}`}
+                  style={{
+                    height: 'auto',
+                    maxHeight: '40px',
+                    cursor: 'pointer',
+                  }}
+                />
+              </Link>
 
               {/* 유틸리티 메뉴: 통합검색, 회원가입, 전문가 회원 전환 신청, 로그인 */}
               <Stack direction="row" spacing={1} alignItems="center">
