@@ -38,3 +38,4 @@ VITE_API_BASE_URL=https://example.com/api
 [{ "id": 1, "title": "게시글 제목", "writer": "관리자", "createdAt": "2025-12-16" }]
 ```
      
+     
